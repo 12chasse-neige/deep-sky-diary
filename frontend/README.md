@@ -19,7 +19,7 @@ npm run dev
 
 Each entry stores an object name/catalog ID, type, observation date, location, separate telescope/optics and camera notes, qualitative sky conditions and field notes. Optional fields record paired latitude/longitude in signed decimal degrees, seeing in arcseconds, cloud cover and relative humidity in percent. Older combined equipment notes remain visible in record details. Date, object and notes are required. Examples are fictional, labeled, excluded from counts and exports, and replaced by the first personal record.
 
-Accounts and observations are stored in PostgreSQL through the Scala backend. Start the API before using the frontend; see [backend setup](../README.md). The app does not read or write diary records in browser storage. Existing browser records are left intact, with no automatic import.
+The GitHub Pages build uses `VITE_STORAGE_MODE=browser` and saves observations in this browser without sign-in. The default local build stores accounts and observations in PostgreSQL through the Scala backend. Start the API before using the frontend; see [backend setup](../README.md). The account edition does not read or write diary records in browser storage. The Pages edition uses a new, project-scoped `deep-sky-observations-v1:` key. Existing browser records are left intact, with no automatic import.
 
 ## Background
 

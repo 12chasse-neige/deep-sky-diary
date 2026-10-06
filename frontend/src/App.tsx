@@ -29,10 +29,13 @@ import { SkyBackground } from './components/SkyBackground';
 import { useReducedMotion } from './hooks/useReducedMotion';
 import { LanguageToggle } from './components/LanguageToggle';
 import { localizeSample } from './data/sampleEntries';
+import { browserStorageEnabled } from './lib/browserStorage';
 import { AuthGate } from './components/AuthGate';
 
 // Page composition and archive controls. Form drafts and modal behavior live in components.
 export default function App() {
+  if (browserStorageEnabled)
+    return <Diary user={{ id: 'browser', username: '' }} signOut={() => {}} onExpired={() => {}} />;
   return (
     <AuthGate>
       {(user, signOut, expired) => (
@@ -174,11 +177,19 @@ function Diary({
       <main>
         <div className="account-bar">
           <span>
-            {language === 'zh' ? `${user.username} 的星空档案` : `${user.username}’s sky archive`}
+            {browserStorageEnabled
+              ? t('这台设备的星空档案')
+              : language === 'zh'
+                ? `${user.username} 的星空档案`
+                : `${user.username}’s sky archive`}
           </span>
-          <button className="outline" onClick={signOut}>
-            {t('退出登录')}
-          </button>
+          {browserStorageEnabled ? (
+            <span className="storage-note">{t('保存在此浏览器 · 可导出备份')}</span>
+          ) : (
+            <button className="outline" onClick={signOut}>
+              {t('退出登录')}
+            </button>
+          )}
         </div>
         {status !== 'ready' && (
           <div className="connection-state" role={status === 'error' ? 'alert' : 'status'}>
@@ -408,7 +419,13 @@ function Diary({
             <span>{t('深空手记')}</span>
           </a>
           <span>{t('宇宙很大，慢慢记录。')}</span>
-          <small>{t('记录保存在你的私人账户 · 可在星空档案中导出备份')}</small>
+          <small>
+            {t(
+              browserStorageEnabled
+                ? '记录仅保存在此浏览器 · 清除浏览器数据前请导出备份'
+                : '记录保存在你的私人账户 · 可在星空档案中导出备份',
+            )}
+          </small>
           <span className="footer-star">✦</span>
         </footer>
       </main>

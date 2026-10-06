@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Entry, ObservationDraft } from '../types';
+import { browserStorageEnabled, observationStorageKey } from '../lib/browserStorage';
 import { ApiError, errorMessage, request } from '../lib/api';
 
 /** Mounted once per account. Abort reads and ignore late writes after logout/account changes. */
@@ -39,6 +40,19 @@ export function useEntries(onError: (message: string) => void, onExpired: () => 
       });
     return () => controller.abort();
   }, [reload, handleError]);
+
+  useEffect(() => {
+    if (!browserStorageEnabled) return;
+    const changed = (event: StorageEvent) => {
+      if (
+        event.storageArea === localStorage &&
+        (event.key === observationStorageKey || event.key === null)
+      )
+        setReload((value) => value + 1);
+    };
+    window.addEventListener('storage', changed);
+    return () => window.removeEventListener('storage', changed);
+  }, []);
 
   async function create(draft: ObservationDraft): Promise<boolean> {
     try {

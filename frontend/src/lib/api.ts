@@ -1,3 +1,4 @@
+import { browserStorageEnabled, browserRequest, BrowserStorageError } from './browserStorage';
 /** Cookies stay HttpOnly; this module never stores credentials in browser storage. */
 export class ApiError extends Error {
   constructor(
@@ -8,6 +9,7 @@ export class ApiError extends Error {
   }
 }
 export async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (browserStorageEnabled) return browserRequest<T>(path, init);
   const response = await fetch(`/api${path}`, {
     ...init,
     credentials: 'same-origin',
@@ -24,5 +26,7 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
   return response.status === 204 ? (undefined as T) : response.json();
 }
 export function errorMessage(error: unknown): string {
-  return error instanceof ApiError ? error.message : '无法连接服务，请检查连接后重试。';
+  return error instanceof ApiError || error instanceof BrowserStorageError
+    ? error.message
+    : '无法连接服务，请检查连接后重试。';
 }

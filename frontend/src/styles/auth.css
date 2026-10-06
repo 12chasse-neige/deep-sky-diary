@@ -101,3 +101,18 @@
     font-size: 23px;
   }
 }
+
+.storage-note {
+  color: #9ba8bb;
+  font-size: 9px;
+}
+@media (max-width: 760px) {
+  .account-bar:has(.storage-note) {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .storage-note {
+    flex-basis: 100%;
+    text-align: right;
+  }
+}

@@ -12,6 +12,19 @@ export type Language = 'zh' | 'en';
 const preferenceKey = 'deep-sky-language';
 
 const english: Record<string, string> = {
+  这台设备的星空档案: 'Your sky archive on this device',
+  '保存在此浏览器 · 可导出备份': 'Saved in this browser · Export a backup',
+  '记录仅保存在此浏览器 · 清除浏览器数据前请导出备份':
+    'Saved only in this browser · Export before clearing browser data',
+  '私人手记 · 保存在此浏览器': 'Private notes · Saved in this browser',
+  '无法读取此浏览器的记录。请允许本站使用浏览器存储后重试。':
+    'Unable to read records. Allow browser storage for this site and retry.',
+  '浏览器中的记录无法读取，原有数据未被修改。请检查备份后重试。':
+    'Unable to read existing records. Your stored data has not been changed. Check your backup and retry.',
+  '无法更新记录：浏览器存储不可用或空间不足。请导出备份后重试。':
+    'Unable to update records. Browser storage is unavailable or full. Export a backup and retry.',
+  '此操作在浏览器手记中不可用。': 'This action is not available in the browser diary',
+
   深空手记: 'Deep Sky Diary',
   主导航: 'Main navigation',
   观测台: 'Observatory',

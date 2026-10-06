@@ -2,6 +2,14 @@
 
 A private multi-user observation diary. The React/TypeScript interface talks to one Scala HTTP API; PostgreSQL stores accounts, sessions and observations. The existing sky background, optional video, search, filters and JSON export remain available.
 
+## Public website and GitHub Actions
+
+The public browser edition is hosted at [Deep Sky Diary](https://12chasse-neige.github.io/deep-sky-diary/). `.github/workflows/deploy-pages.yml` builds and publishes `frontend/` whenever its files change on `main`, or when manually dispatched. GitHub Pages must use **GitHub Actions** as its publishing source.
+
+The Pages workflow sets `VITE_STORAGE_MODE=browser`. This edition opens without sign-in and saves observations only in the visitor's browser, scoped to this project's URL. It has no account sync; clearing browser data removes those local records, so use the archive's JSON export for backups. Exported records preserve the same schema as the account edition. Existing records in the local PostgreSQL database are not uploaded or migrated.
+
+The default local build still uses the Scala API and PostgreSQL. `.github/workflows/ci.yml` checks the frontend and runs backend integration tests against a disposable PostgreSQL database. Repository uploads exclude local credentials, database files, the separate Tencent studio and coursework files.
+
 ## Local setup on macOS
 
 Requirements: JDK 21, sbt (the project pins sbt 1.12.13), PostgreSQL 18, Node/npm. IntelliJ can open the root sbt project; WebStorm can open `frontend/`.
@@ -51,7 +59,7 @@ Only the backend receives these variables; never put credentials in `VITE_*` var
 | `COOKIE_SECURE` | `false` for loopback HTTP; `true` for future HTTPS |
 | `TEST_DB_URL` | Dedicated integration-test database ending in `_test` |
 
-Vite uses port 5173 strictly and proxies `/api` to 8080 without changing the browser Origin. Production hosting is not configured. A future deployment should serve frontend and API on one HTTPS origin, update the origin allowlist, enable secure cookies, and add operational backups. `npm run preview` alone is not the full application.
+Vite uses port 5173 strictly and proxies `/api` to 8080 without changing the browser Origin. The browser edition is published on GitHub Pages. A deployment of the account edition should serve frontend and API on one HTTPS origin, update the origin allowlist, enable secure cookies, and add operational backups. `npm run preview` alone is not the full application.
 
 ## Backend organization
 

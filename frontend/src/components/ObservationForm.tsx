@@ -3,6 +3,7 @@ import { useState, useRef, type FormEvent } from 'react';
 import { Telescope, Plus, MapPin, Camera, CloudMoon } from 'lucide-react';
 import type { Kind, ObservationDraft } from '../types';
 import { kinds } from '../data/objectKinds';
+import { browserStorageEnabled } from '../lib/browserStorage';
 import { today } from '../lib/date';
 import { JournalDate, JournalSelect, validDate } from './JournalControls';
 
@@ -294,7 +295,8 @@ export function ObservationForm({ onSave, disabled }: Props) {
         )}
         <div className="save-line">
           <span>
-            <span className="status-dot" /> {t('私人手记 · 保存在你的账户')}
+            <span className="status-dot" />{' '}
+            {t(browserStorageEnabled ? '私人手记 · 保存在此浏览器' : '私人手记 · 保存在你的账户')}
           </span>
           <button className="primary" type="submit">
             {saving ? t('正在保存…') : t('收录这束光')} <Plus size={17} />
