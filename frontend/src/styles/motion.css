@@ -1,0 +1,90 @@
+/* Prefer transform/opacity animation so the page does not reflow while moving. */
+@keyframes sky-drift {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.045) translate3d(-0.6%, 0.4%, 0);
+  }
+}
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 20px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes icon-arrive {
+  from {
+    transform: scale(0.8) rotate(-12deg);
+  }
+  to {
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes orbit-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+@keyframes toast-arrive {
+  from {
+    opacity: 0;
+    translate: 0 15px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+.hero-copy > * {
+  animation: reveal-up 0.9s var(--ease) both;
+}
+.hero-copy > :nth-child(2) {
+  animation-delay: 0.1s;
+}
+.hero-copy > :nth-child(3) {
+  animation-delay: 0.2s;
+}
+.hero-copy > :nth-child(4),
+.hero-copy > :nth-child(5) {
+  animation-delay: 0.3s;
+}
+/* Pausing affects the whole interface, including the optional video via SkyBackground. */
+html[data-motion='off'] {
+  scroll-behavior: auto;
+}
+html[data-motion='off'] *,
+html[data-motion='off'] *::before,
+html[data-motion='off'] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Auth screens and other static consumers also pause the decorative image drift. */
+.sky-background[data-moving='false'] .sky-media {
+  animation: none;
+}

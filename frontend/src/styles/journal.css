@@ -1,0 +1,259 @@
+/* Quiet surfaces replace box outlines. Form fields lift on focus, not through permanent borders. */
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 48px;
+}
+.panel {
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+}
+.journal {
+  padding: 36px;
+  background: #0b121cbc;
+  backdrop-filter: blur(24px);
+  scroll-margin-top: 114px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+.section-head h2 {
+  font-weight: 400;
+  font-size: 24px;
+  letter-spacing: -0.5px;
+  margin: 13px 0 0;
+}
+.section-icon {
+  color: #cad0d9;
+}
+.kind-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 30px 0;
+}
+.kind-picker button {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  position: relative;
+  text-align: left;
+  border-radius: 14px;
+  padding: 15px 12px;
+  color: #aeb7c5;
+}
+.kind-picker button > span {
+  font-size: 12px;
+}
+.kind-picker small {
+  display: block;
+  font-size: 7px;
+  letter-spacing: 0.6px;
+  margin-top: 5px;
+}
+.kind-picker button.chosen {
+  background: #ffffff12;
+  color: white;
+}
+.kind-picker button:hover {
+  background: #ffffff0d;
+  transform: translateY(-3px);
+}
+.kind-picker button.chosen > svg {
+  animation: icon-arrive 0.5s var(--ease);
+}
+.choice-dot {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #e7d4b8;
+}
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 23px 20px;
+}
+.field-grid label {
+  display: block;
+  font-size: 11px;
+  color: #d0d5df;
+  min-width: 0;
+}
+.field-grid label > span {
+  font-size: 7px;
+  letter-spacing: 1px;
+  color: #96a1b2;
+  margin-left: 7px;
+}
+.wide {
+  grid-column: 1/-1;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-radius: 10px;
+  background: #ffffff06;
+  color: #f0f2f6;
+  padding: 14px;
+  font-size: 12px;
+}
+input:hover,
+select:hover,
+textarea:hover {
+  background: #ffffff0b;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  background: #ffffff12;
+  box-shadow: 0 8px 24px #0001;
+}
+/* Focused labels reinforce the field highlight without drawing a box around the text. */
+.field-grid label:focus-within {
+  color: white;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #9da6b5;
+}
+select option {
+  background: #17202c;
+}
+.field-grid input,
+.field-grid select,
+.field-grid textarea {
+  margin-top: 10px;
+}
+.field-grid textarea {
+  min-height: 142px;
+  resize: vertical;
+  line-height: 1.9;
+}
+.character-count {
+  display: block;
+  text-align: right;
+  color: #8f9bad;
+  font-size: 9px;
+  margin-top: 8px;
+}
+.save-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 24px;
+  margin-top: 10px;
+}
+.save-line > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #aab4c3;
+}
+aside {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 25px;
+  padding-top: 20px;
+}
+.note-card {
+  position: relative;
+  padding: 12px 8px;
+}
+.note-card .eyebrow {
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+.orbital-art {
+  display: block;
+  width: 180px;
+  height: auto;
+  margin: 20px auto;
+  overflow: visible;
+}
+.orbit-paths {
+  stroke: #e2ded46b;
+  stroke-width: 0.8;
+}
+.orbit-star,
+.orbit-satellite {
+  fill: #e4dbca;
+}
+.orbit-star {
+  filter: drop-shadow(0 0 7px #e4dbca40);
+}
+.orbit-satellite {
+  offset-path: path('M160 90 A70 43 0 1 1 20 90 A70 43 0 1 1 160 90');
+  offset-rotate: 0deg;
+  animation: orbit-travel 18s linear infinite;
+}
+@keyframes orbit-travel {
+  to {
+    offset-distance: 100%;
+  }
+}
+.note-card h3 {
+  font-size: 23px;
+  font-weight: 300;
+  line-height: 1.8;
+  letter-spacing: 0;
+  margin: 15px 0;
+}
+.note-card p {
+  font-size: 11px;
+  line-height: 2.2;
+  color: #b9c0cc;
+}
+.note-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 26px;
+  color: #d6d8df;
+  font-size: 9px;
+}
+.stats {
+  padding: 20px 8px;
+}
+.stats .eyebrow {
+  font-size: 8px;
+  letter-spacing: 1.8px;
+}
+.stats > div {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 23px;
+}
+.stats strong {
+  font-size: 40px;
+  font-weight: 300;
+  letter-spacing: -2px;
+}
+.stats div span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  font-size: 10px;
+  color: #c0c6d0;
+}
+.stats > a {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 28px;
+  color: #ece8e1;
+  font-size: 11px;
+}

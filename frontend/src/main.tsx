@@ -1,45 +1,21 @@
-import React, {useEffect, useState} from 'react';
-import {createRoot} from 'react-dom/client';
-import {ArrowUpRight, ArrowRight, BookOpen, Sprout, PenLine, Search, X, Heart, Leaf, ChevronLeft, ChevronRight, Check, Trash2, Download, Sun, CloudSun, Cloud, CloudRain, CloudLightning} from 'lucide-react';
-import './style.css';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import { LanguageProvider } from './lib/language';
+import './styles/global.css';
+import './styles/layout.css';
+import './styles/journal.css';
+import './styles/archive.css';
+import './styles/responsive.css';
+import './styles/motion.css';
+import './styles/auth.css';
+import './styles/controls.css';
+import './styles/language.css';
 
-type Mood = 'happy'|'good'|'calm'|'low'|'storm';
-type Entry = {id:string; title:string; text:string; mood:Mood; date:string; tags:string[]};
-const moods = [{id:'happy',label:'晴空万里',icon:Sun,color:'#e5b95e'},{id:'good',label:'有点开心',icon:CloudSun,color:'#9baf76'},{id:'calm',label:'平平淡淡',icon:Cloud,color:'#9bb6bd'},{id:'low',label:'有点低落',icon:CloudRain,color:'#a3a2c2'},{id:'storm',label:'心里下雨',icon:CloudLightning,color:'#a897ab'}] as const;
-const prompts=['今天，有什么小事让你笑了一下？','如果今天是一种颜色，它会是什么？','此刻，你最想对自己说什么？','记下一件你想好好珍藏的小事。'];
-const key='manman-entries-v1';
-const today=()=>new Date().toLocaleDateString('sv-SE');
-const samples:Entry[]=[{id:'sample-1',title:'把脚步放慢一点',text:'回家的路上绕了一点远路，发现街角的桂花开了。原来有些美好，真的要慢下来才看得见。',mood:'good',date:'2026-09-29',tags:['生活碎片','小确幸']},{id:'sample-2',title:'一杯热茶的时间',text:'下午给自己泡了一杯茶，什么也没做，只是看着窗外发呆。这样的时刻，也很值得。',mood:'calm',date:'2026-09-28',tags:['独处时光']},{id:'sample-3',title:'普通日子的小小奖励',text:'终于完成了拖了很久的事情。买了一束小花送给自己，今天也有好好生活。',mood:'happy',date:'2026-09-27',tags:['小确幸']}];
-function readEntries():Entry[]{try{const data=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(data)?data.filter(e=>typeof e.id==='string'&&typeof e.title==='string'&&typeof e.text==='string'&&moods.some(m=>m.id===e.mood)&&/^\d{4}-\d{2}-\d{2}$/.test(e.date)&&Array.isArray(e.tags)):[];}catch{return [];}}
-function App(){
- const [page,setPage]=useState(location.hash==='#memories'?'memories':'today');
- const [entries,setEntries]=useState<Entry[]>(readEntries); const [mood,setMood]=useState<Mood>('good');
- const [title,setTitle]=useState(''); const [text,setText]=useState(''); const [tags,setTags]=useState<string[]>([]);const [prompt,setPrompt]=useState(0);
- const [query,setQuery]=useState('');const [filter,setFilter]=useState('all');const [active,setActive]=useState<Entry|null>(null);const [toast,setToast]=useState('');const [showSamples,setShowSamples]=useState(true);const [deleteConfirm,setDeleteConfirm]=useState(false);
- const [month,setMonth]=useState(()=>new Date(new Date().getFullYear(),new Date().getMonth(),1));
- useEffect(()=>{const fn=()=>setPage(location.hash==='#memories'?'memories':'today');window.addEventListener('hashchange',fn);return()=>window.removeEventListener('hashchange',fn)},[]);
- useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(''),3500);return()=>clearTimeout(t)},[toast]);
- useEffect(()=>{if(!active)return;const fn=(e:KeyboardEvent)=>{if(e.key==='Escape')setActive(null)};window.addEventListener('keydown',fn);return()=>window.removeEventListener('keydown',fn)},[active]);
- const persist=(next:Entry[])=>{try{localStorage.setItem(key,JSON.stringify(next));setEntries(next);return true}catch{setToast('储存空间不足，请先导出日记备份。');return false}};
- const save=()=>{if(!text.trim()){setToast('先写下一点今天的故事吧。');document.querySelector<HTMLTextAreaElement>('textarea')?.focus();return}const entry={id:crypto.randomUUID(),title:title.trim()||'今天的小小记录',text:text.trim(),mood,date:today(),tags};if(persist([entry,...entries])){setText('');setTitle('');setTags([]);setToast('今天的心情，已经好好收藏了。')}};
- const exportEntries=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(entries,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`慢慢日记-${today()}.json`;a.click();URL.revokeObjectURL(url);setToast('日记备份已导出。')};
- const visible=entries.length?entries:(showSamples?samples:[]);const filtered=visible.filter(e=>(filter==='all'||e.mood===filter)&&`${e.title} ${e.text} ${e.tags.join(' ')}`.toLowerCase().includes(query.toLowerCase()));
- const openEntry=(e:Entry)=>{setDeleteConfirm(false);setActive(e)};
- const firstDay=(new Date(month.getFullYear(),month.getMonth(),1).getDay()+6)%7;const days=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
- return <><header className="header"><div className="header-inner"><a className="brand" href="#today"><img src="/favicon.svg" alt=""/><span>慢慢<small>LITTLE BY LITTLE</small></span></a><nav aria-label="主导航"><a className={page==='today'?'selected':''} href="#today"><Sprout size={17}/>今日心情</a><a className={page==='memories'?'selected':''} href="#memories"><BookOpen size={17}/>时光手记</a></nav><span className="header-note"><span/> 给自己一点温柔的时间</span></div></header>
- <main>
- {page==='today'?<>
- <section className="hero"><img className="hero-art" src="/media/manman-garden.png" alt="水豚慢慢抱着日记本，安静地坐在溪边的雏菊花丛中"/><video className="hero-video" autoPlay muted loop playsInline poster="/media/manman-garden.png" aria-label="慢慢的花园" hidden={!import.meta.env.VITE_HERO_VIDEO} src={import.meta.env.VITE_HERO_VIDEO||undefined}/><div className="hero-shade"/><div className="hero-copy"><span className="eyebrow"><span/> YOUR LITTLE CORNER OF CALM</span><h1>日子慢慢过，<br/>心情<span>好好说。</span></h1><p>我是慢慢，陪你收集平凡日子里的小小心事。<br/>不必每一天都很精彩，每一种心情都值得被记下。</p><a className="primary" href="#write" onClick={()=>setTimeout(()=>document.querySelector<HTMLInputElement>('#entry-title')?.focus(),100)}>写下今天 <PenLine size={16}/></a><span className="hero-foot">一页日记，一点靠近自己的时间。</span></div><span className="scene-caption"><Leaf size={13}/> 慢慢的河边花园</span></section>
- <div className="day-line"><span><Sun size={17}/> {new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'})}</span><span>今天也辛苦了，先和自己打个招呼吧。<span className="small-star">✳</span></span></div>
- <div className="workspace"><section className="journal paper" id="write"><div className="section-head"><div><span className="eyebrow">A MOMENT FOR YOURSELF</span><h2>今天，你的心情是什么天气？</h2></div><span className="mini-leaf"><Sprout size={24}/></span></div><div className="moods" role="group" aria-label="选择今天的心情">{moods.map(m=><button key={m.id} aria-pressed={mood===m.id} className={'mood '+(mood===m.id?'chosen':'')} onClick={()=>setMood(m.id)}><span className="mood-symbol" style={{background:m.color+'22',color:m.color}}><m.icon size={29} strokeWidth={1.6}/></span><span>{m.label}</span></button>)}</div><div className="writing"><label className="sr-only" htmlFor="entry-title">日记标题</label><input id="entry-title" placeholder="给今天起个小标题吧…" maxLength={80} value={title} onChange={e=>setTitle(e.target.value)}/><label className="sr-only" htmlFor="entry-body">日记内容</label><textarea id="entry-body" placeholder={prompts[prompt]+'\n不着急，想到哪里，就写到哪里。'} value={text} maxLength={10000} onChange={e=>setText(e.target.value)}/><div className="writing-bottom"><button className="prompt-btn" onClick={()=>setPrompt((prompt+1)%prompts.length)}><span>✧</span> 换一个小灵感</button><span>{text.length} / 10000</span></div></div><div className="tags"><span>给今天贴个标签</span>{['小确幸','生活碎片','独处时光','值得纪念'].map(t=><button className={tags.includes(t)?'tag active':'tag'} key={t} aria-pressed={tags.includes(t)} onClick={()=>setTags(tags.includes(t)?tags.filter(x=>x!==t):[...tags,t])}># {t}</button>)}</div><div className="save-line"><span><Heart size={14}/> 只在这个浏览器里，安心存放</span><button className="primary" onClick={save}>收藏今天 <ArrowRight size={16}/></button></div></section>
- <aside><section className="note-card"><span className="eyebrow">A LITTLE NOTE FROM MANMAN</span><span className="quote-mark">“</span><h3>允许自己，<br/>偶尔只是发发呆。</h3><p>小草没有每天都长高，<br/>你也不用每天都很厉害。</p><span className="signature">慢慢 <Leaf size={15}/></span></section><section className="calendar paper"><div className="calendar-head"><h3>{month.getFullYear()} 年 {month.getMonth()+1} 月</h3><div><button aria-label="上个月" onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()-1,1))}><ChevronLeft size={16}/></button><button aria-label="下个月" onClick={()=>setMonth(new Date(month.getFullYear(),month.getMonth()+1,1))}><ChevronRight size={16}/></button></div></div><div className="calendar-grid">{['一','二','三','四','五','六','日'].map(d=><span className="weekday" key={d}>{d}</span>)}{Array.from({length:firstDay},(_,i)=><span key={'empty'+i}/>)}{Array.from({length:days},(_,i)=>{const date=`${month.getFullYear()}-${String(month.getMonth()+1).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`;return <span className={(date===today()?'current ':'')+(entries.some(e=>e.date===date)?'recorded':'')} key={date}>{i+1}</span>})}</div><p><span className="record-dot"/> 已珍藏 {new Set(entries.map(e=>e.date)).size} 天的心情</p></section></aside></div>
- <section className="recent"><div className="section-head"><div><span className="eyebrow">LITTLE MOMENTS, KEPT FOREVER</span><h2>把小日子，慢慢收藏</h2></div><a href="#memories">翻翻时光手记 <ArrowUpRight size={17}/></a></div>{!entries.length&&<p className="sample-label">示例手记 · 你的第一篇日记，会从这里开始</p>}<div className="entry-grid">{visible.slice(0,3).map(e=><EntryCard key={e.id} entry={e} onOpen={()=>openEntry(e)}/>)}</div></section>
- </>:<section className="memories"><div className="memories-heading"><span className="eyebrow">THE DAYS THAT MAKE YOU, YOU</span><h1>时光有迹，<span>心事有处。</span></h1><p>回头看看，那些认真生活过的小小瞬间。</p></div><div className="memory-toolbar"><div className="memory-count"><BookOpen size={20}/><b>{entries.length}</b> 篇我的手记</div><button className="outline" disabled={!entries.length} onClick={exportEntries}><Download size={15}/> 导出日记</button><a href="#today" className="primary">记下此刻 <PenLine size={16}/></a></div><div className="filter-row"><div className="filters">{[{id:'all',label:'全部心情'},...moods].map(m=><button key={m.id} onClick={()=>setFilter(m.id)} className={filter===m.id?'active':''}>{m.label}</button>)}</div><label className="search"><Search size={16}/><input aria-label="搜索日记" placeholder="寻找一段小回忆…" value={query} onChange={e=>setQuery(e.target.value)}/></label></div>{!entries.length&&showSamples&&<div className="sample-banner">下面是示例手记。写下你的第一篇日记后，这里将展示你的故事。<button onClick={()=>setShowSamples(false)}>隐藏示例 <X size={14}/></button></div>}<div className="entry-grid">{filtered.map(e=><EntryCard key={e.id} entry={e} onOpen={()=>openEntry(e)}/>)}</div>{!filtered.length&&<div className="empty"><Sprout size={40}/><h2>{query||filter!=='all'?'这片回忆还没有被找到':'故事，正等你写下第一行。'}</h2><p>{query||filter!=='all'?'试试其他关键词或心情。':'从今天的一件小事开始吧。'}</p><a className="outline" href="#today">去写日记 <ArrowRight size={15}/></a></div>}<div className="memory-end"><Leaf size={18}/><span>每一个普通的日子，都有自己的光。</span></div></section>}
- <footer><a className="footer-brand" href="#today">慢慢 <Sprout size={16}/></a><span>慢一点，也没关系。</span><small>属于你的心情角落 · 数据保存在当前浏览器，可在时光手记中导出</small></footer></main>
- {toast&&<div className="toast" role="status"><Check size={17}/>{toast}</div>}
- {active&&<div className="modal-backdrop" onClick={()=>setActive(null)}><dialog ref={node=>{if(node&&!node.open)node.showModal()}} onCancel={()=>setActive(null)} className="entry-modal" aria-labelledby="modal-title" onClick={e=>e.stopPropagation()}><button autoFocus className="close" aria-label="关闭日记" onClick={()=>setActive(null)}><X/></button><span className="eyebrow">{active.date} · {moods.find(m=>m.id===active.mood)?.label}</span><h2 id="modal-title">{active.title}</h2><p className="full-text">{active.text}</p><div className="tags">{active.tags.map(t=><span className="tag" key={t}># {t}</span>)}</div>{!active.id.startsWith('sample')&&<div className="delete-row">{deleteConfirm?<><span>确定删除这篇日记吗？</span><button className="danger" onClick={()=>{if(persist(entries.filter(e=>e.id!==active.id))){setActive(null);setToast('这篇日记已删除。')}}}>确认删除</button><button className="outline" onClick={()=>setDeleteConfirm(false)}>保留</button></>:<button className="delete" onClick={()=>setDeleteConfirm(true)}><Trash2 size={14}/> 删除这篇</button>}</div>}</dialog></div>}
- </>;
-}
-function EntryCard({entry,onOpen}:{entry:Entry;onOpen:()=>void}){const mood=moods.find(m=>m.id===entry.mood)!;return <button className={'entry-card '+entry.mood} onClick={onOpen}><div className="entry-top"><span>{entry.date.replaceAll('-',' / ')}</span><mood.icon size={23} style={{color:mood.color}}/></div><h3>{entry.title}</h3><p>{entry.text}</p><div className="entry-bottom"><span>{entry.tags.map(t=>'# '+t).join('   ')}</span><ArrowUpRight size={17}/></div></button>}
-
-createRoot(document.getElementById('root')!).render(<React.StrictMode><App/></React.StrictMode>);
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
+  </StrictMode>,
+);

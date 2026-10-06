@@ -45,3 +45,11 @@ build/
 
 ### Scala ###
 .bsp/
+# Local backend credentials, databases, and generated test artifacts
+.env.local
+.local/
+output/
+
+__pycache__/
+
+.playwright-cli/

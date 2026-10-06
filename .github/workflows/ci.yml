@@ -1,0 +1,67 @@
+name: Validate Deep Sky Diary
+
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run build
+
+  backend:
+    name: Backend and database tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: deep_sky
+          # This disposable database exists only within the CI job.
+          POSTGRES_PASSWORD: ci-test-only
+          POSTGRES_DB: deep_sky_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U deep_sky -d deep_sky_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DB_URL: jdbc:postgresql://127.0.0.1:5432/deep_sky
+      DB_USER: deep_sky
+      DB_PASSWORD: ci-test-only
+      TEST_DB_URL: jdbc:postgresql://127.0.0.1:5432/deep_sky_test
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: sbt
+      - uses: sbt/setup-sbt@5ffaf2b6f207c2df06fee08e16bd6110e300b04d # v1
+      - run: sbt scalafmtCheckAll test
